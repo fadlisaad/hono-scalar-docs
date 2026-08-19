@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hono-scalar-docs",
+  "main": "dist/_worker.js",
+  "compatibility_date": "2025-02-14",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "account_id": "32abd2cf8ee3665026a8e669443fccad",
+  "kv_namespaces": [
+    {
+      "binding": "DOCS_KV",
+      "id": "b63bd9991f074b31825edc9ac1dab07c"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
