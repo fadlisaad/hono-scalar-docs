@@ -173,6 +173,7 @@ console.log(example);
               <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="insertAround('**', '**')">Bold</button>
               <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="insertAround('*', '*')">Italic</button>
               <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="insertAround('```typescript\n', '\n```')">Code</button>
+              <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="insertText('```mermaid\ngraph TD\n    A[Client] -->|Request| B[API Gateway]\n    B --> C[Service]\n```\n')">📊 Mermaid</button>
               <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="insertText('> [!NOTE]\n> ')">Note Alert</button>
               <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="insertText('> [!TIP]\n> ')">Tip Alert</button>
               <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="insertText('> [!WARNING]\n> ')">Warning</button>
@@ -206,14 +207,27 @@ console.log(example);
         </div>
       </form>
 
-      {/* Include client-side Marked for fast live preview */}
+      {/* Include client-side Marked and Mermaid for live preview */}
       <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
       <script dangerouslySetInnerHTML={{ __html: `
         const contentTextarea = document.getElementById('doc-content');
         const previewContainer = document.getElementById('live-preview-container');
         const titleInput = document.getElementById('doc-title');
         const slugInput = document.getElementById('doc-slug');
         const isNewDoc = ${isNew ? 'true' : 'false'};
+        let mermaidTimer = null;
+
+        // Custom marked renderer for Mermaid in preview
+        const previewRenderer = new marked.Renderer();
+        const origCodeRenderer = previewRenderer.code.bind(previewRenderer);
+        previewRenderer.code = function({ text, lang }) {
+          const language = (lang || '').trim().toLowerCase();
+          if (language === 'mermaid') {
+            return '<div class="mermaid-block"><pre class="mermaid">' + text + '</pre></div>';
+          }
+          return origCodeRenderer({ text, lang });
+        };
 
         if (isNewDoc) {
           titleInput?.addEventListener('input', () => {
@@ -235,7 +249,24 @@ console.log(example);
               const clean = content.split('\\n').map(l => l.replace(/^>\\s?/, '')).join('\\n');
               return '<div style="border-left: 4px solid var(--admin-accent); background: rgba(249,115,22,0.1); padding: 0.5rem 0.75rem; border-radius: 0.35rem; margin: 1rem 0;"><strong>' + type + '</strong><br>' + clean + '</div>';
             });
-            previewContainer.innerHTML = marked.parse(md);
+            previewContainer.innerHTML = marked.parse(md, { renderer: previewRenderer });
+
+            // Render Mermaid diagrams in preview
+            if (typeof mermaid !== 'undefined') {
+              clearTimeout(mermaidTimer);
+              mermaidTimer = setTimeout(() => {
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                mermaid.initialize({
+                  startOnLoad: false,
+                  theme: isDark ? 'dark' : 'default',
+                  securityLevel: 'loose'
+                });
+                const mermaidNodes = previewContainer.querySelectorAll('.mermaid');
+                if (mermaidNodes.length > 0) {
+                  mermaid.run({ nodes: Array.from(mermaidNodes) }).catch(() => {});
+                }
+              }, 150);
+            }
           }
         }
 

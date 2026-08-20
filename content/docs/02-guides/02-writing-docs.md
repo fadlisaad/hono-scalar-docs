@@ -79,3 +79,41 @@ Code blocks are automatically highlighted with Prism.js and include a one-click 
   }
 }
 ```
+
+## Mermaid Diagrams
+
+You can embed interactive diagrams and flowcharts directly in your markdown using ````mermaid```` code blocks. The documentation engine automatically renders them into SVGs that dynamically adapt to light and dark themes.
+
+### Flowchart Example
+
+```mermaid
+graph TD
+    A[Client Request] --> B[Cloudflare Edge Worker]
+    B --> C{Route Match}
+    C -->|/docs/*| D[Markdown SSR Engine]
+    C -->|/reference| E[Scalar API Reference]
+    C -->|/api/*| F[Hono REST Router]
+    D --> G[Client HTML Response]
+    E --> G
+    F --> G
+```
+
+### Sequence Diagram Example
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser
+    participant Worker as Cloudflare Worker
+    participant DB as Storage / KV
+
+    User->>Browser: Navigate to /docs
+    Browser->>Worker: GET /docs/guides/mermaid
+    Worker->>DB: Fetch Doc Content
+    DB-->>Worker: Return Markdown
+    Worker-->>Browser: Return Rendered HTML with Mermaid
+    Browser->>Browser: Execute client-side mermaid.run()
+    Browser-->>User: Interactive Diagram Displayed
+```
+

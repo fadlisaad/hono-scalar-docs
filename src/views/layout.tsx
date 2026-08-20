@@ -543,8 +543,32 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
           .callout-warning { border-color: #f59e0b; background: rgba(245, 158, 11, 0.08); }
           .callout-warning .callout-title { color: #d97706; }
 
-          .callout-caution { border-color: #ef4444; background: rgba(239, 68, 68, 0.08); }
-          .callout-caution .callout-title { color: #dc2626; }
+          /* Mermaid Diagram Container */
+          .mermaid-block {
+            margin: 1.5rem 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+          }
+
+          .mermaid-block .mermaid {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background: transparent;
+            font-family: var(--font-sans);
+          }
+
+          .mermaid-block .mermaid svg {
+            max-width: 100%;
+            height: auto;
+          }
 
           /* Heading Anchors */
           .heading-anchor {
@@ -786,8 +810,63 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
           {children}
         </div>
 
+        {/* Mermaid JS Library for Diagrams */}
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
         {/* Interactive Client-Side Scripts */}
         <script dangerouslySetInnerHTML={{ __html: `
+          // Mermaid Diagrams Rendering
+          function renderMermaid() {
+            if (typeof mermaid === 'undefined') return;
+            const nodes = document.querySelectorAll('.mermaid');
+            if (nodes.length === 0) return;
+
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 
+              (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const isDark = currentTheme === 'dark';
+
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: isDark ? 'dark' : 'default',
+              themeVariables: isDark ? {
+                darkMode: true,
+                background: '#111827',
+                primaryColor: '#f97316',
+                primaryTextColor: '#f9fafb',
+                primaryBorderColor: '#f97316',
+                lineColor: '#fdba74',
+                secondaryColor: '#1f2937',
+                tertiaryColor: '#0b0f19'
+              } : {
+                primaryColor: '#fff7ed',
+                primaryBorderColor: '#f97316',
+                primaryTextColor: '#0f172a',
+                lineColor: '#ea580c'
+              },
+              securityLevel: 'loose'
+            });
+
+            nodes.forEach(el => {
+              if (!el.getAttribute('data-original-code')) {
+                el.setAttribute('data-original-code', el.textContent || '');
+              } else {
+                el.removeAttribute('data-processed');
+                el.innerHTML = el.getAttribute('data-original-code') || '';
+              }
+            });
+
+            mermaid.run({ nodes: Array.from(nodes) }).catch(err => {
+              console.warn('Mermaid rendering notice:', err);
+            });
+          }
+
+          // Initial run on page load
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderMermaid);
+          } else {
+            renderMermaid();
+          }
+
           // Theme toggling
           const themeToggleBtn = document.getElementById('theme-toggle-btn');
           const savedTheme = localStorage.getItem('theme');
@@ -801,6 +880,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
             const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', nextTheme);
             localStorage.setItem('theme', nextTheme);
+            renderMermaid();
           });
 
           // Mobile sidebar drawer

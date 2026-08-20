@@ -270,6 +270,32 @@ export const AdminLayout: FC<PropsWithChildren<AdminLayoutProps>> = ({
             line-height: 1.6;
           }
 
+          /* Mermaid Diagram Container */
+          .mermaid-block {
+            margin: 1.25rem 0;
+            background: var(--admin-input-bg);
+            border: 1px solid var(--admin-border);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+          }
+
+          .mermaid-block .mermaid {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background: transparent;
+            font-family: var(--admin-font);
+          }
+
+          .mermaid-block .mermaid svg {
+            max-width: 100%;
+            height: auto;
+          }
+
           /* Toast message */
           .toast-box {
             position: fixed;

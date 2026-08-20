@@ -64,6 +64,13 @@ export function parseMarkdown(rawMarkdown: string): {
 
   renderer.code = ({ text, lang }) => {
     const language = (lang || '').trim().toLowerCase()
+
+    if (language === 'mermaid') {
+      return `<div class="mermaid-block">
+      <pre class="mermaid">${escapeHtml(text)}</pre>
+    </div>\n`
+    }
+
     let highlighted = escapeHtml(text)
 
     if (language && Prism.languages[language]) {

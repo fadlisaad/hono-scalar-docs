@@ -1,4 +1,5 @@
 import app from './src/index'
+import { parseMarkdown } from './src/docs/markdown'
 
 async function runTests() {
   console.log('--- Testing Documentation & Admin Platform Endpoints ---')
@@ -254,6 +255,81 @@ Webhooks allow external applications to receive real-time notifications about ev
     // Verify it is no longer accessible
     const publicRes = await app.request('/docs/guides/webhooks-guide')
     if (publicRes.status !== 404) throw new Error(`Expected 404 after deletion, got ${publicRes.status}`)
+  })
+
+  // --- Phase 3 Mermaid Diagram Tests ---
+
+  // 17. parseMarkdown handles mermaid code blocks
+  await test('parseMarkdown correctly renders mermaid code block as mermaid-block container', async () => {
+    const raw = `
+# Architecture Diagram
+
+\`\`\`mermaid
+graph TD
+    A[Client] --> B[Hono App]
+\`\`\`
+`
+    const { html } = parseMarkdown(raw)
+    if (!html.includes('class="mermaid-block"')) throw new Error('Missing mermaid-block wrapper')
+    if (!html.includes('<pre class="mermaid">')) throw new Error('Missing pre.mermaid container')
+    if (!html.includes('A[Client] --&gt; B[Hono App]')) throw new Error('Missing escaped diagram content')
+  })
+
+  // 18. Public doc page renders mermaid diagram and includes client script
+  await test('GET /docs/guides/writing-docs renders Mermaid diagrams and mermaid.min.js', async () => {
+    const res = await app.request('/docs/guides/writing-docs')
+    if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`)
+    const html = await res.text()
+    if (!html.includes('mermaid-block')) throw new Error('Missing mermaid-block class in doc HTML')
+    if (!html.includes('class="mermaid"')) throw new Error('Missing class="mermaid" in doc HTML')
+    if (!html.includes('mermaid@11/dist/mermaid.min.js')) throw new Error('Missing mermaid library script')
+    if (!html.includes('renderMermaid()')) throw new Error('Missing renderMermaid script logic')
+  })
+
+  // 19. Dynamic doc with mermaid created via admin is rendered with mermaid container
+  await test('POST /api/admin/docs with mermaid diagram renders mermaid container on public doc', async () => {
+    const mermaidDocPayload = {
+      title: 'Distributed System Architecture',
+      category: 'Guides',
+      author: 'Architecture Team',
+      slug: 'guides/system-architecture',
+      order: 10,
+      description: 'Distributed cloud architecture diagram.',
+      content: `# Distributed Architecture
+
+Overview of our high-availability deployment:
+
+\`\`\`mermaid
+sequenceDiagram
+    participant C as Client
+    participant E as Edge Worker
+    participant O as Origin
+    C->>E: GET /api/v1/data
+    E->>O: Forward if cache miss
+    O-->>E: Origin response
+    E-->>C: Edge cached response
+\`\`\`
+`
+    }
+
+    const createRes = await app.request('/api/admin/docs', {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(mermaidDocPayload)
+    })
+    if (createRes.status !== 201) throw new Error(`Expected 201 Created, got ${createRes.status}`)
+
+    const viewRes = await app.request('/docs/guides/system-architecture')
+    if (viewRes.status !== 200) throw new Error(`Expected 200, got ${viewRes.status}`)
+    const html = await viewRes.text()
+    if (!html.includes('class="mermaid-block"')) throw new Error('Missing mermaid-block in dynamic doc')
+    if (!html.includes('sequenceDiagram')) throw new Error('Missing sequenceDiagram in rendered HTML')
+
+    // Clean up
+    await app.request('/api/admin/docs/guides/system-architecture', {
+      method: 'DELETE',
+      headers: authHeaders
+    })
   })
 
   console.log(`\n========================================`)
