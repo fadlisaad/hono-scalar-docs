@@ -82,7 +82,7 @@ export function parseMarkdown(rawMarkdown: string): {
     }
 
     const langBadge = language ? `<span class="code-lang">${language}</span>` : ''
-    const copyButton = `<button class="copy-code-btn" type="button" title="Copy code" onclick="navigator.clipboard.writeText(this.closest('pre').querySelector('code').innerText);this.innerText='Copied!';setTimeout(()=>this.innerText='Copy',2000)">Copy</button>`
+    const copyButton = `<button class="copy-code-btn" type="button" title="Copy code" onclick="navigator.clipboard.writeText(this.closest('.code-block-wrapper').querySelector('code').innerText);this.innerText='Copied!';setTimeout(()=>this.innerText='Copy',2000)">Copy</button>`
 
     return `<div class="code-block-wrapper">
       <div class="code-block-header">
@@ -94,8 +94,8 @@ export function parseMarkdown(rawMarkdown: string): {
   }
 
   renderer.table = ({ header, rows }) => {
-    const headerHtml = header.map(cell => `<th>${cell.text}</th>`).join('')
-    const bodyHtml = rows.map(row => `<tr>${row.map(cell => `<td>${cell.text}</td>`).join('')}</tr>`).join('')
+    const headerHtml = header.map(cell => `<th>${marked.parseInline(cell.text) as string}</th>`).join('')
+    const bodyHtml = rows.map(row => `<tr>${row.map(cell => `<td>${marked.parseInline(cell.text) as string}</td>`).join('')}</tr>`).join('')
     return `<div class="table-container"><table><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div>\n`
   }
 

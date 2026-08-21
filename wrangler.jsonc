@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hono-scalar-docs",
+  "name": "documentation",
   "main": "dist/_worker.js",
   "compatibility_date": "2025-02-14",
   "compatibility_flags": [

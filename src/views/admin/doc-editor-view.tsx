@@ -219,12 +219,20 @@ console.log(example);
         let mermaidTimer = null;
 
         // Custom marked renderer for Mermaid in preview
+        function escapePreviewHtml(html) {
+          return html
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
         const previewRenderer = new marked.Renderer();
         const origCodeRenderer = previewRenderer.code.bind(previewRenderer);
         previewRenderer.code = function({ text, lang }) {
           const language = (lang || '').trim().toLowerCase();
           if (language === 'mermaid') {
-            return '<div class="mermaid-block"><pre class="mermaid">' + text + '</pre></div>';
+            return '<div class="mermaid-block"><pre class="mermaid">' + escapePreviewHtml(text) + '</pre></div>';
           }
           return origCodeRenderer({ text, lang });
         };
