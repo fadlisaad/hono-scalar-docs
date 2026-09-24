@@ -162,7 +162,13 @@ export async function getMergedDocs(storage: StorageProvider): Promise<DocItem[]
 
 export async function getMergedDocBySlug(storage: StorageProvider, slug: string): Promise<DocItem | undefined> {
   const allDocs = await getMergedDocs(storage)
-  return allDocs.find(d => d.slug === slug || d.slug.endsWith(`/${slug}`))
+  const doc = allDocs.find(d => d.slug === slug || d.slug.endsWith(`/${slug}`))
+  if (!doc) return undefined
+
+  // KV docs store HTML rendered at save time, which goes stale when the renderer changes
+  // (e.g. docs saved before mermaid support). Re-render from the markdown on every view.
+  const { html, headings } = parseMarkdown(doc.rawContent)
+  return { ...doc, htmlContent: html, headings }
 }
 
 export async function getMergedNavigation(storage: StorageProvider): Promise<NavigationCategory[]> {

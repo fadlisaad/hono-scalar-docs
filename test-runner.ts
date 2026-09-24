@@ -1,5 +1,6 @@
 import app from './src/index'
 import { parseMarkdown } from './src/docs/markdown'
+import { getStorage } from './src/storage/kv'
 
 async function runTests() {
   console.log('--- Testing Documentation & Admin Platform Endpoints ---')
@@ -330,6 +331,27 @@ sequenceDiagram
       method: 'DELETE',
       headers: authHeaders
     })
+  })
+
+  // 20. Docs saved before a renderer change must not serve their stale stored HTML
+  await test('Stored doc with stale htmlContent is re-rendered from rawContent', async () => {
+    await getStorage().saveDoc({
+      slug: 'guides/stale-doc',
+      category: 'Guides',
+      categorySlug: 'guides',
+      categoryOrder: 50,
+      title: 'Stale Doc',
+      description: '',
+      order: 1,
+      rawContent: '# Stale Doc\n\n```mermaid\ngraph TD\n    A --> B\n```\n',
+      htmlContent: '<pre class="language-mermaid"><code>graph TD</code></pre>',
+      headings: [],
+      isDynamic: true,
+      updatedAt: new Date().toISOString()
+    })
+    const html = await (await app.request('/docs/guides/stale-doc')).text()
+    if (!html.includes('class="mermaid-block"')) throw new Error('Stale stored HTML was served instead of re-rendering')
+    await getStorage().deleteDoc('guides/stale-doc')
   })
 
   console.log(`\n========================================`)
