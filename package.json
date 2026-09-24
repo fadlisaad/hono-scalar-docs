@@ -27,7 +27,7 @@
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
     "vite-node": "^3.0.5",
-    "wrangler": "^3.109.2"
+    "wrangler": "^4.137.0"
   },
   "module": "src/index.tsx",
   "private": true
