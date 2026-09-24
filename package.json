@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.18.4",
-    "@scalar/hono-api-reference": "^0.5.176",
     "gray-matter": "^4.0.3",
     "hono": "^4.7.2",
     "marked": "^15.0.7",
@@ -23,10 +22,13 @@
     "@cloudflare/workers-types": "^4.20250214.0",
     "@hono/vite-cloudflare-pages": "^0.4.2",
     "@hono/vite-dev-server": "^0.18.2",
+    "@types/bun": "latest",
     "@types/prismjs": "^1.26.5",
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
     "vite-node": "^3.0.5",
     "wrangler": "^3.109.2"
-  }
+  },
+  "module": "src/index.tsx",
+  "private": true
 }

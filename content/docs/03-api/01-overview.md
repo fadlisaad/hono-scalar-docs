@@ -1,56 +1,80 @@
 ---
-title: API Architecture & Overview
-description: Overview of the REST API endpoints and interactive Scalar playground.
+title: NexGen API Overview
+description: Base URLs, authentication, request format and error handling for the NexGen API.
 category: API Reference
 order: 1
 ---
 
-# API Overview & Playground
+# NexGen API Overview
 
-This project includes a built-in REST API powered by `@hono/zod-openapi` and interactive documentation rendered via `@scalar/hono-api-reference`.
+The NexGen API lets you create bills and take payments. It follows RESTful principles and every response, including errors, is JSON.
 
-## Interactive API Playground
+👉 **[Open the interactive API reference](/reference)** to try each endpoint in the browser.
 
-You can explore all endpoints and test requests directly in the browser:
+## Products
 
-👉 **[Launch Interactive Scalar API Playground](/reference)**
+| Product | What it does | Guide |
+| :--- | :--- | :--- |
+| **Collection Payment** | Group bills into **Collections**, send customers to a hosted payment page | [Collection Payment](/docs/api/collection-payment) |
+| **QR Payment** | Register **Terminals** and generate dynamic, per-transaction QR codes | [QR Payment](/docs/api/qr-payment) |
+| **Callbacks & Redirects** | How NexGen tells your server and your customer about a payment result | [Callbacks & Redirects](/docs/api/callbacks-and-redirects) |
 
-## API Design Principles
+## Base URL
 
-1. **Type-Safe Validation**: All request bodies, query parameters, path params, and responses are validated via Zod.
-2. **OpenAPI 3.1 Standard**: Specification generated natively at `/openapi.json`.
-3. **Consistent Responses**: Standardized JSON response envelope across all endpoints.
+Examples use `https://nexgen.example.com`. Replace it with the staging or production host you receive with your credentials. All paths start with the API version, `api/v1`:
 
-## Base URLs
-
-| Environment | URL |
-| :--- | :--- |
-| **Local Development** | `http://localhost:5173` |
-| **Production Edge** | `https://hono-scalar-docs.your-subdomain.workers.dev` |
-
-## Endpoints Overview
-
-- `GET /api/v1/health` - System health and edge latency check.
-- `GET /api/v1/users` - List all registered users with pagination.
-- `POST /api/v1/users` - Create a new user with validation.
-- `GET /api/v1/users/:id` - Retrieve user profile by ID.
-- `GET /api/v1/projects` - List active projects.
-
-## Example Request
-
-```bash
-curl -X GET "http://localhost:5173/api/v1/users/usr_1" \
-  -H "Accept: application/json"
+```text
+https://nexgen.example.com/api/v1/collection/get/list
 ```
 
-Response:
+## Authentication
+
+Every request needs two credentials from your **NexGen dashboard**:
+
+| Credential | Sent as | Example |
+| :--- | :--- | :--- |
+| `ApiKey` | HTTP header | `ApiKey: YOUR_API_KEY` |
+| `ApiSecret` | Query string parameter | `?ApiSecret=YOUR_API_SECRET` |
+
+```bash
+curl "https://nexgen.example.com/api/v1/collection/get/list?ApiSecret=$NEXGEN_API_SECRET" \
+  -H "ApiKey: $NEXGEN_API_KEY"
+```
+
+> [!WARNING]
+> Keep your API key and secret on your server. Never ship them in browser or mobile app code.
+
+## Request format
+
+Endpoints that create data accept `multipart/form-data`. `application/x-www-form-urlencoded` and `application/json` bodies are also supported. Request fields are prefixed with `field`, for example `fieldName` or `fieldAmount`.
+
+## Errors
+
+Errors share one shape:
 
 ```json
 {
-  "id": "usr_1",
-  "name": "Sarah Connor",
-  "email": "sarah@example.com",
-  "role": "admin",
-  "createdAt": "2026-01-15T08:30:00.000Z"
+  "status": "error",
+  "message": "There was a validation error. Please review the input and try again.",
+  "error": {
+    "fieldName": "The field name field is required."
+  }
 }
 ```
+
+| HTTP status | Meaning | `error` contains |
+| :--- | :--- | :--- |
+| `400` | Validation failed | An object mapping each invalid field to its message |
+| `401` | Missing or invalid `ApiKey` / `ApiSecret` | Not present |
+| `404` | Collection, terminal or bill not found | A short reason string |
+| `500` | Unexpected server error | A diagnostic string |
+
+## Statuses
+
+| Resource | Values |
+| :--- | :--- |
+| **Collection / Terminal** | `active`, `inactive` |
+| **Bill / QR** | `unpaid`, `pending`, `paid`, `expired` |
+
+> [!IMPORTANT]
+> NexGen assumes no liability for financial losses caused by improper use of the API. Always confirm a payment from the server-side callback or the Get Billing Data endpoint, not only from the redirect.

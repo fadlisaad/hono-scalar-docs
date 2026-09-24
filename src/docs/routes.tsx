@@ -44,7 +44,7 @@ docsApp.get('/docs/:slug', async (c) => {
   return c.html(<DocPage doc={doc} navigation={navigation} />)
 })
 
-// Two-level slug: /docs/getting-started/introduction
+// Two-level slug: /docs/api/overview
 docsApp.get('/docs/:category/:slug', async (c) => {
   const category = c.req.param('category')
   const slug = c.req.param('slug')

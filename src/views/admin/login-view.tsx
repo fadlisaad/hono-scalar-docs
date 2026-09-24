@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png?inline'
 import { FC } from 'hono/jsx'
 
 interface LoginViewProps {
@@ -11,7 +12,8 @@ export const LoginView: FC<LoginViewProps> = ({ error, redirect = '/admin' }) =>
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Admin Login | Docs Platform</title>
+        <title>Admin Login | NexGen Docs</title>
+        <link rel="icon" type="image/png" href={logo} />
         <style dangerouslySetInnerHTML={{ __html: `
           :root {
             --bg: #090d16;
@@ -101,8 +103,8 @@ export const LoginView: FC<LoginViewProps> = ({ error, redirect = '/admin' }) =>
       <body>
         <div class="login-card">
           <div class="brand-badge">
-            <span>⚙️</span>
-            <span>Docs Admin Panel</span>
+            <img src={logo} alt="" width="22" height="22" />
+            <span>NexGen Docs Admin</span>
           </div>
 
           {error && <div class="error-banner">{error}</div>}

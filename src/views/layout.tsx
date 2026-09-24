@@ -1,4 +1,5 @@
 import { FC, PropsWithChildren } from 'hono/jsx'
+import logo from '../assets/logo.png?inline'
 
 interface LayoutProps {
   title?: string
@@ -8,11 +9,11 @@ interface LayoutProps {
 
 export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   children,
-  title = 'Modern Edge Docs',
-  description = 'Documentation and API Reference powered by Hono, Scalar, and Cloudflare Workers.',
+  title = 'NexGen Docs',
+  description = 'Guides and API reference for NexGen Collection Payment and QR Payment.',
   activePath = '/'
 }) => {
-  const fullTitle = title === 'Modern Edge Docs' ? title : `${title} | Edge Docs`
+  const fullTitle = title === 'NexGen Docs' ? title : `${title} | NexGen Docs`
 
   return (
     <html lang="en">
@@ -21,7 +22,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{fullTitle}</title>
         <meta name="description" content={description} />
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+        <link rel="icon" type="image/png" href={logo} />
         
         {/* CSS Styles */}
         <style dangerouslySetInnerHTML={{ __html: `
@@ -749,9 +750,8 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
               ☰
             </button>
             <a href="/" class="brand-logo">
-              <span style="font-size: 1.35rem">⚡</span>
-              <span>HonoDocs</span>
-              <span class="brand-badge">Cloudflare</span>
+              <img src={logo} alt="" width="28" height="28" />
+              <span>NexGen Docs</span>
             </a>
             <ul class="nav-links">
               <li>

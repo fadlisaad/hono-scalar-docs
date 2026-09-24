@@ -8,6 +8,7 @@ import { adminAuthMiddleware } from './admin/auth'
 import { adminViews } from './admin/routes'
 import { adminApi } from './admin/api'
 import { getStorage } from './storage/kv'
+import nexgenSpec from '../NexGen API Reference-openapi.json'
 
 const app = new OpenAPIHono()
 
@@ -55,10 +56,8 @@ app.get('/openapi.json', async (c) => {
     }
   }
 
-  // Fetch default OpenAPI generated schema
-  const defaultRes = await app.request('/openapi.default.json', {}, c.env)
-  const defaultSpec = await defaultRes.json()
-  return c.json(defaultSpec)
+  // NexGen API spec is the project's source of truth
+  return c.json(nexgenSpec)
 })
 
 // Scalar Interactive API Reference

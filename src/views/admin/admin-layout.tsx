@@ -1,3 +1,4 @@
+import logo from '../../assets/logo.png?inline'
 import { FC, PropsWithChildren } from 'hono/jsx'
 
 interface AdminLayoutProps {
@@ -15,8 +16,8 @@ export const AdminLayout: FC<PropsWithChildren<AdminLayoutProps>> = ({
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{title} | Docs Admin</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>" />
+        <title>{title} | NexGen Docs Admin</title>
+        <link rel="icon" type="image/png" href={logo} />
         
         {/* Instant theme initializer to prevent flashing */}
         <script dangerouslySetInnerHTML={{ __html: `
@@ -315,8 +316,8 @@ export const AdminLayout: FC<PropsWithChildren<AdminLayoutProps>> = ({
       <body>
         <aside class="admin-sidebar">
           <a href="/admin" class="admin-brand">
-            <span style="font-size: 1.3rem">⚡</span>
-            <span>Hono Admin</span>
+            <img src={logo} alt="" width="26" height="26" />
+            <span>NexGen Docs</span>
           </a>
 
           <nav class="admin-nav">

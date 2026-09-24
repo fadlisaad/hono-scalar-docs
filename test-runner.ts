@@ -25,8 +25,8 @@ async function runTests() {
     const res = await app.request('/')
     if (res.status !== 200) throw new Error(`Expected status 200, got ${res.status}`)
     const text = await res.text()
-    if (!text.includes('Next-Gen Documentation')) throw new Error('Missing hero heading')
-    if (!text.includes('HonoDocs')) throw new Error('Missing brand name')
+    if (!text.includes('Collect payments with')) throw new Error('Missing hero heading')
+    if (!text.includes('NexGen Docs')) throw new Error('Missing brand name')
   })
 
   // 2. Docs redirect
@@ -36,12 +36,12 @@ async function runTests() {
   })
 
   // 3. Render static markdown doc
-  await test('GET /docs/getting-started/introduction renders markdown SSR with alerts', async () => {
-    const res = await app.request('/docs/getting-started/introduction')
+  await test('GET /docs/api/overview renders markdown SSR with alerts', async () => {
+    const res = await app.request('/docs/api/overview')
     if (res.status !== 200) throw new Error(`Expected status 200, got ${res.status}`)
     const html = await res.text()
-    if (!html.includes('Introduction to the Docs Platform')) throw new Error('Missing document title')
-    if (!html.includes('callout callout-note')) throw new Error('Missing callout class')
+    if (!html.includes('NexGen API Overview')) throw new Error('Missing document title')
+    if (!html.includes('callout callout-warning')) throw new Error('Missing callout class')
   })
 
   // 4. Scalar API Reference
@@ -276,8 +276,8 @@ graph TD
   })
 
   // 18. Public doc page renders mermaid diagram and includes client script
-  await test('GET /docs/guides/writing-docs renders Mermaid diagrams and mermaid.min.js', async () => {
-    const res = await app.request('/docs/guides/writing-docs')
+  await test('GET /docs/api/collection-payment renders Mermaid diagrams and mermaid.min.js', async () => {
+    const res = await app.request('/docs/api/collection-payment')
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`)
     const html = await res.text()
     if (!html.includes('mermaid-block')) throw new Error('Missing mermaid-block class in doc HTML')
