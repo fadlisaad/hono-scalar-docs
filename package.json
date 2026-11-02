@@ -11,12 +11,12 @@
     "preview": "wrangler dev"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^0.18.4",
+    "@hono/zod-openapi": "^1.6.3",
     "gray-matter": "^4.0.3",
     "hono": "^4.7.2",
     "marked": "^15.0.7",
     "prismjs": "^1.29.0",
-    "zod": "^3.24.2"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
@@ -27,7 +27,7 @@
     "typescript": "^5.7.3",
     "vite": "^6.1.0",
     "vite-node": "^3.0.5",
-    "wrangler": "^3.109.2"
+    "wrangler": "^4.156.1"
   },
   "module": "src/index.tsx",
   "private": true
